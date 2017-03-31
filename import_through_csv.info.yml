@@ -1,0 +1,5 @@
+name: Import through CSV
+description: Import entities through CSV
+core: 8.x
+package: custom
+type: module

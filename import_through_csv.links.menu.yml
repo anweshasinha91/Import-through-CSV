@@ -1,0 +1,6 @@
+import_form_link:
+  title: 'Import Through CSV'
+  description: 'Create entities through import from csv'
+  parent: system.admin_config_development
+  route_name: import_form_link
+  weight: 200
