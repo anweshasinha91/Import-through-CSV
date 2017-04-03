@@ -4,7 +4,14 @@
  use Drupal\Core\Config\Entity;
 
  class Fetchfields{
-     public function contentTypeFields($contentType) {
+     /**
+      * Fetches the  fields of a content type.
+      * @param $contentType
+      *         The selected content type whose fields are required to be fetched
+      * @return array
+      *         An array of fields of the selected content type
+      */
+     public function contentTypeFieldsFetch($contentType) {
          $entityManager = \Drupal::service('entity_field.manager');
          $fields= $entityManager->getFieldDefinitions('node', $contentType);
          foreach($fields as $key=>$value)

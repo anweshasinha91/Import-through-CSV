@@ -21,7 +21,8 @@
      public function buildForm(array $form, FormStateInterface $form_state)
      {
          // TODO: Implement buildForm() method.
-         $contentType= ContentTypeFetch::fetchEntity();
+         $contentTypeObject = new ContentTypeFetch();
+         $contentType= $contentTypeObject->fetchEntity();
             $list[] = array();
          foreach($contentType as $key=>$value)
          {
@@ -57,6 +58,6 @@
          $contentType = $form_state->getValue('contentType');
          $csvFile = $form_state->getValue('csv_file');
          $entity_create_object = new EntityCreate();
-         $entityCreate = $entity_create_object->prepareList($csvFile,$contentType);
+         $entityCreate = $entity_create_object->csvParserList($csvFile[0],$contentType);
      }
  }
