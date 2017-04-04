@@ -10,12 +10,13 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\import_through_csv\EntityCreate;
 use Drupal\import_through_csv\ContentTypeFetch;
 
-
 class ImportController extends FormBase {
+
   public  function getFormId() {
     // TODO: Implement getFormId() method.
     return 'import_form';
   }
+
   public function buildForm(array $form, FormStateInterface $form_state) {
     // TODO: Implement buildForm() method.
     $contentTypeObject = new ContentTypeFetch();
@@ -48,17 +49,17 @@ class ImportController extends FormBase {
       '#button_type' => 'primary',
     );
     return $form;
-     }
+  }
 
   public function validateForm(array &$form, FormStateInterface $form_state){
-     }
+  }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // TODO: Implement submitForm() method.
     $contentType = $form_state->getValue('contentType');
     $csvFile = $form_state->getValue('csv_file');
     $entity_create_object = new EntityCreate();
-    $entity_create_object->csvParserList($csvFile[0],$contentType);
+    $entity_create_object->csvParserList($csvFile[0], $contentType);
   }
 
  }

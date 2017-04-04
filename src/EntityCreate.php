@@ -26,6 +26,7 @@ class EntityCreate {
    *   An array containing the csv file records
    * @param $title
    *   Value for the title field of the selected content Type
+   *
    * @return int
    *   Id of the created entity
    */
@@ -74,13 +75,13 @@ class EntityCreate {
               $tid = $termShift->get('tid')->value;
               $list[$field]['target_id'] = $tid;
             }
-            else{
+            else {
               $termShift = array_shift($term);
               $tid = $termShift->get('tid')->value;
               $list[$field]['target_id'] = $tid;
             }
           }
-          else{
+          else {
             $userRecord = user_load_by_name($csvValue[$field]);
             if ($userRecord == FALSE) {
               $userField['name'] = $csvValue[$field];
@@ -93,7 +94,7 @@ class EntityCreate {
               $uid = $userRecord->get('uid')->value;
               $list[$field]['target_id'] = $uid;
             }
-            else{
+            else {
               $userRecord = user_load_by_name($csvValue[$field]);
               $uid = $userRecord->get('uid')->value;
               $list[$field]['target_id'] = $uid;
@@ -101,7 +102,7 @@ class EntityCreate {
           }
 
         }
-        else{
+        else {
           $list[$field] = $csvValue[$field];
         }
 
@@ -122,24 +123,25 @@ class EntityCreate {
    *   The content type whose content is required to be created
    */
   public function csvParserList($csvFileFid,$contentType) {
-     $file = \Drupal\file\Entity\File::load($csvFileFid);
-     $path = $file->getFileUri();
-     $csv = array_map('str_getcsv', file($path));
-     foreach ($csv[0] as $headerId => $headerValue) {
-       $headerTitle[]=$headerValue;
-     }
-     unset($csv[0]);
-     foreach ($csv as $id => $value) {
-       foreach ($value as $key => $csvValue) {
-         $items[$id][$headerTitle[$key]] = $csvValue;
-       }
-     }
-     $entity[] = array();
-     foreach ($items as $csvId => $csvValue) {
-       $title = $csvValue['title'];
-       $entity = $this->createEntity($contentType, $csvValue, $title);
-     }
-     drupal_set_message(t('Entities created'));
+    $file = \Drupal\file\Entity\File::load($csvFileFid);
+    $path = $file->getFileUri();
+    $csv = array_map('str_getcsv', file($path));
+    foreach ($csv[0] as $headerId => $headerValue) {
+      $headerTitle[]=$headerValue;
+    }
+    unset($csv[0]);
+    $items = array();
+    foreach ($csv as $id => $value) {
+      foreach ($value as $key => $csvValue) {
+        $items[$id][$headerTitle[$key]] = $csvValue;
+      }
+    }
+    $entity[] = array();
+    foreach ($items as $csvId => $csvValue) {
+      $title = $csvValue['title'];
+      $entity = $this->createEntity($contentType, $csvValue, $title);
+    }
+    drupal_set_message(t('Entities created'));
   }
 
 }
