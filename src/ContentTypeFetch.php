@@ -12,7 +12,6 @@ class ContentTypeFetch {
    * @return array
    *   An array of content type of the site
    */
-
   public function fetchEntity() {
     $contentTypes = \Drupal::service('entity.manager')->getStorage('node_type')->loadMultiple();
     $contentTypesList[] = array();

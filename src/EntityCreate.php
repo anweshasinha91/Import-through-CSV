@@ -127,7 +127,7 @@ class EntityCreate {
     $path = $file->getFileUri();
     $csv = array_map('str_getcsv', file($path));
     foreach ($csv[0] as $headerId => $headerValue) {
-      $headerTitle[]=$headerValue;
+      $headerTitle[] = $headerValue;
     }
     unset($csv[0]);
     $items = array();

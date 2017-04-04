@@ -22,8 +22,8 @@ class ImportController extends FormBase {
     $contentTypeObject = new ContentTypeFetch();
     $contentType = $contentTypeObject->fetchEntity();
     $contentTypeList = array();
-    foreach ($contentType as $key=>$value) {
-      $contentTypeList[$key]=$value;
+    foreach ($contentType as $key => $value) {
+      $contentTypeList[$key] = $value;
     }
     $form['contentType'] = array(
       '#type' => 'radios',
