@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains \Drupal\import_through_csv\Controller\ImportController
  */
@@ -23,16 +24,20 @@
          // TODO: Implement buildForm() method.
          $contentTypeObject = new ContentTypeFetch();
          $contentType= $contentTypeObject->fetchEntity();
-            $list[] = array();
+            $contentTypeList = array();
          foreach($contentType as $key=>$value)
          {
-                $list[$key]=$value;
+           $contentTypeList[$key]=$value;
          }
          $form['contentType'] = array(
              '#type' => 'radios',
-             '#options' => $list,
-             '#title' => t('Content Type'),
-             '#description' =>t('Select a content type whose content you want to create. If it referes to any entity, the content of that entity will automatically be created once the csv file is uploaded.'),
+             '#options' => $contentTypeList,
+             '#title' => $this->t('Content Type'),
+             '#description' => $this->t('Select a content type whose content you want to create. If it refers to any entity,
+                                        the content of that entity will automatically be created once the csv file is uploaded.
+                                        The title of the columns, of your csv file must match with the machine name of the fields. For eg:- If
+                                        the machine name of the field is field_book, the title must also be field_book.
+             '),
          );
          $form['csv_file'] = array(
              '#type' => 'managed_file',
@@ -58,6 +63,6 @@
          $contentType = $form_state->getValue('contentType');
          $csvFile = $form_state->getValue('csv_file');
          $entity_create_object = new EntityCreate();
-         $entityCreate = $entity_create_object->csvParserList($csvFile[0],$contentType);
+         $entity_create_object->csvParserList($csvFile[0],$contentType);
      }
  }
