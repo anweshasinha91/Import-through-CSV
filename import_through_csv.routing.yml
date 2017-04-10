@@ -4,4 +4,4 @@ import_form_link:
     _title: 'Import Form'
     _form: '\Drupal\import_through_csv\Controller\ImportController'
   requirements:
-    _permission: 'access content'
+    _permission: 'administer import_through_csv'
