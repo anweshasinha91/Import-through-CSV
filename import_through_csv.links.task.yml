@@ -1,5 +1,4 @@
 import_form_tab:
   route_name : import_form_link
-  title: Import Form
-  base_route: import_form_link
-  weight: 20
+  title: Import Through CSV
+  base_route: system.admin_content

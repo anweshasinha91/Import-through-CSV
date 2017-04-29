@@ -14,7 +14,7 @@ class ContentTypeFetch {
    */
   public function fetchEntity() {
     $contentTypes = \Drupal::service('entity.manager')->getStorage('node_type')->loadMultiple();
-    $contentTypesList[] = array();
+    $contentTypesList = array();
     foreach ($contentTypes as $contentType) {
       $contentTypesList[$contentType->id()] = $contentType->label();
     }

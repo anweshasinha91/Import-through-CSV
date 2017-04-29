@@ -1,5 +1,5 @@
 import_form_link:
-  path: '/admin/content/importForm'
+  path: '/admin/importForm'
   defaults:
     _title: 'Import Form'
     _form: '\Drupal\import_through_csv\Controller\ImportController'
