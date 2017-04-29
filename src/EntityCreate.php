@@ -18,6 +18,30 @@ use Drupal\user\Entity\User;
 
 class EntityCreate {
 
+  public function termExistOrCreate($targetBundle, $termName, $csvValue) {
+    $term = \Drupal::entityTypeManager()
+      ->getStorage('taxonomy_term')
+      ->loadByProperties(['name' => $termName]);
+    if (sizeof($term) == 0) {
+      $termList['name'] = $termName;
+      $termList['vid'] = $targetBundle[0];
+      if (array_key_exists("parent", $csvValue)) {
+        $parent = $csvValue['parent'];
+        unset($csvValue['parent']);
+        $termParent = $this->termExistOrCreate($targetBundle, $parent, $csvValue);
+        $termList['parent'] = $termParent;
+      }
+      $term = Term::create($termList);
+      $term->save();
+      $term = \Drupal::entityTypeManager()
+        ->getStorage('taxonomy_term')
+        ->loadByProperties(['name' => $termName]);
+    }
+    $termShift = array_shift($term);
+    $tid = $termShift->get('tid')->value;
+    return $tid;
+  }
+
   /**
    * Creates entity and references entity.
    * @param $contentType
@@ -45,41 +69,37 @@ class EntityCreate {
           if ($targetEntityType[1] == 'node') {
             $targetBundle = array_keys($fieldSettings['handler_settings']['target_bundles']);
             if (array_key_exists($field, $csvValue)) {
-              $query = \Drupal::entityQuery('node')->condition('type', $targetBundle[0])->condition('title', $csvValue[$field], 'CONTAINS');
-              $nid = $query->execute();
-              if (sizeof($nid) == 0) {
-                $targetIdRecords = array_keys($this->createEntity($targetBundle[0], $csvValue, $csvValue[$field]));
-                $list[$field]['target_id'] = $targetIdRecords[0];
-              }
-              else {
-                $id = array_keys($nid);
-                $list[$field]['target_id'] = $id[0];
+              if (strpos($csvValue[$field], '|') !== false) {
+                $explodeCsvField = explode('|', $csvValue[$field]);
+                foreach ($explodeCsvField as $multiValueKey => $multiValue) {
+                  $query = \Drupal::entityQuery('node')->condition('type', $targetBundle[0])->condition('title', $multiValue, 'CONTAINS');
+                  $nid = $query->execute();
+                  if (sizeof($nid) == 0) {
+                    $targetIdRecords = array_keys($this->createEntity($targetBundle[0], $csvValue, $multiValue));
+                    $list[$field][$multiValueKey]['target_id'] = $targetIdRecords[0];
+                  } else {
+                    $id = array_keys($nid);
+                    $list[$field][$multiValueKey]['target_id'] = $id[0];
+                  }
+                }
+              } else {
+                $query = \Drupal::entityQuery('node')->condition('type', $targetBundle[0])->condition('title', $csvValue[$field], 'CONTAINS');
+                $nid = $query->execute();
+                if (sizeof($nid) == 0) {
+                  $targetIdRecords = array_keys($this->createEntity($targetBundle[0], $csvValue, $csvValue[$field]));
+                  $list[$field]['target_id'] = $targetIdRecords[0];
+                } else {
+                  $id = array_keys($nid);
+                  $list[$field]['target_id'] = $id[0];
+                }
               }
             }
           }
           elseif ($targetEntityType[1] == 'taxonomy_term') {
             $targetBundle = array_keys($fieldSettings['handler_settings']['target_bundles']);
-            $term_name = $csvValue[$field];
-            $term = \Drupal::entityTypeManager()
-              ->getStorage('taxonomy_term')
-              ->loadByProperties(['name' => $term_name]);
-            if (sizeof($term) == 0) {
-              $termList['name'] = $csvValue[$field];
-              $termList['vid'] = $targetBundle[0];
-              $term = Term::create($termList);
-              $term->save();
-              $term = \Drupal::entityTypeManager()
-                ->getStorage('taxonomy_term')
-                ->loadByProperties(['name' => $csvValue[$field]]);
-              $termShift = array_shift($term);
-              $tid = $termShift->get('tid')->value;
-              $list[$field]['target_id'] = $tid;
-            }
-            else {
-              $termShift = array_shift($term);
-              $tid = $termShift->get('tid')->value;
-              $list[$field]['target_id'] = $tid;
-            }
+            $termName = $csvValue[$field];
+            $tid = $this->termExistOrCreate($targetBundle, $termName, $csvValue);
+            $list[$field]['target_id'] = $tid;
           }
           else {
             $userRecord = user_load_by_name($csvValue[$field]);
@@ -103,9 +123,16 @@ class EntityCreate {
 
         }
         else {
-          $list[$field] = $csvValue[$field];
+          if(strpos($csvValue[$field], '|') !== false) {
+              $explodeCsvField = explode('|',$csvValue[$field]);
+              foreach($explodeCsvField as $multiValueKey => $multiValue) {
+                $list[$field][$multiValueKey] = $multiValue;
+              }
+          }
+          else {
+            $list[$field] = $csvValue[$field];
+          }
         }
-
       }
     }
     $node = Node::create($list);
