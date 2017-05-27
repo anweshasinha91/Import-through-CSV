@@ -55,6 +55,33 @@ class EntityCreate {
   }
 
   /**
+   * Checks whether user exist or not. If exists it creates and returns its uid.
+   * @param $csvValue
+   *    An array containing csv file records/row
+   * @param $name
+   *    Name of the user
+   * @return int
+   *    uid of the user.
+   */
+  public function userExistOrCreate($csvValue, $name) {
+    $userRecord = user_load_by_name($name);
+    if ($userRecord == FALSE) {
+      $userField['name'] = $name;
+      $userField['mail'] = $csvValue['mail'];
+      $userField['pass'] = $csvValue['pass'];
+      $userField['status'] = $csvValue['status'];
+      $user = User::create($userField);
+      $user->save();
+      $userRecord = user_load_by_name($name);
+      $uid = $userRecord->get('uid')->value;
+    }
+    else {
+      $uid = $userRecord->get('uid')->value;
+    }
+    return $uid;
+  }
+
+  /**
    * Creates entity and references entity.
    * @param $contentType
    *   The bundle whose content is required to be created.
@@ -114,23 +141,8 @@ class EntityCreate {
             $list[$field]['target_id'] = $tid;
           }
           else {
-            $userRecord = user_load_by_name($csvValue[$field]);
-            if ($userRecord == FALSE) {
-              $userField['name'] = $csvValue[$field];
-              $userField['mail'] = $csvValue['mail'];
-              $userField['pass'] = $csvValue['pass'];
-              $userField['status'] = $csvValue['status'];
-              $user = User::create($userField);
-              $user->save();
-              $userRecord = user_load_by_name($csvValue[$field]);
-              $uid = $userRecord->get('uid')->value;
-              $list[$field]['target_id'] = $uid;
-            }
-            else {
-              $userRecord = user_load_by_name($csvValue[$field]);
-              $uid = $userRecord->get('uid')->value;
-              $list[$field]['target_id'] = $uid;
-            }
+            $userId = $this->userExistOrCreate($csvValue, $csvValue[$field]);
+            $list[$field]['target_id'] = $userId;
           }
 
         }
