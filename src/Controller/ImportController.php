@@ -7,7 +7,7 @@ namespace Drupal\import_through_csv\Controller;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\import_through_csv\EntityCreate;
+use Drupal\import_through_csv\EntityCreateUpdate;
 use Drupal\import_through_csv\ContentTypeFetch;
 
 class ImportController extends FormBase {
@@ -35,6 +35,11 @@ class ImportController extends FormBase {
                                         the machine name of the field is field_book, the title must also be field_book.
        '),
     );
+    $form['update'] = array(
+      '#type' =>'checkbox',
+      '#title' => 'Update',
+      '#description' => 'Check Update if you want to update any existing content'
+    );
     $form['csv_file'] = array(
       '#type' => 'managed_file',
       '#upload_location' => 'public://csv',
@@ -57,9 +62,10 @@ class ImportController extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // TODO: Implement submitForm() method.
     $contentType = $form_state->getValue('contentType');
+    $update = $form_state->getValue('update');
     $csvFile = $form_state->getValue('csv_file');
-    $entity_create_object = new EntityCreate();
-    $entity_create_object->csvParserList($csvFile[0], $contentType);
+    $entity_create_object = new EntityCreateUpdate();
+    $entity_create_object->csvParserList($csvFile[0], $contentType, $update);
   }
 
  }
